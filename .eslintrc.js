@@ -14,7 +14,7 @@ module.exports = {
     // allow debugger during development
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
     indent: 'off',
-    'space-before-function-paren': ['error', 'never']
-    // off,
+    'space-before-function-paren': ['error', 'never'],
+    'vue/multi-word-component-names': 'off'
   }
 }
