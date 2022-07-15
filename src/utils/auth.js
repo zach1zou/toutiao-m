@@ -6,4 +6,4 @@ export const getToken = () => storage.get(TOkEN_KEY)
 
 export const setToken = (token) => storage.set(TOkEN_KEY, token)
 
-export const remove = () => storage.remove()
+export const remove = () => storage.remove(TOkEN_KEY)
