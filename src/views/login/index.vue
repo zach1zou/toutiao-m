@@ -94,7 +94,7 @@ export default {
         this.$store.commit('setUser', res.data.data)
         this.$toast.success('登录成功')
         // console.log('登录成功',res);
-        this.$router.push('/index')
+        this.$router.push('/')
       } catch (err) {
         // console.log('登录失败', err)
         // this.$toast.fail('登录失败')
