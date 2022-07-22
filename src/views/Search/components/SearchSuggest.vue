@@ -1,6 +1,7 @@
 <template>
   <div>
     <van-cell
+      @click="goToSuggestResult(index)"
       icon="search"
       v-for="(item, index) in highlightedData"
       :key="index"
@@ -18,6 +19,10 @@ export default {
     keyword: {
       type: String,
       default: () => ' '
+    },
+    searchHistoryList: {
+      type: Array,
+      default: () => []
     }
   },
   components: {},
@@ -30,7 +35,7 @@ export default {
     async getSuggestion() {
       try {
         const res = await getSuggestionListApi(this.keyword)
-        console.log(res.data.data.options)
+        console.log(res.data.data.options, '====')
 
         if (
           res.data.data.options.length === 0 ||
@@ -42,6 +47,12 @@ export default {
       } catch (error) {
         console.log(error)
       }
+    },
+    async goToSuggestResult(index) {
+      const res = await getSuggestionListApi(this.keyword)
+      console.log(res.data.data.options[index])
+      this.$parent.keywords = res.data.data.options[index]
+      // this.$emit('changekeyword', res.data.data.options[index])
     }
   },
   mounted() {},

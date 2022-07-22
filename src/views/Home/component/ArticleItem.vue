@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div @click="gotoResults(articleInfo.art_id)">
     <!-- 渲染无图片 -->
     <van-cell
       v-if="articleInfo.cover.type === 0"
@@ -48,7 +48,11 @@ export default {
   data() {
     return {}
   },
-  methods: {},
+  methods: {
+    gotoResults(id) {
+      this.$router.push({ name: 'detail', params: { articleId: id } })
+    }
+  },
   mounted() {},
   updated() {},
   beforeDestroy() {},
@@ -56,7 +60,7 @@ export default {
   computed: {
     articleDesc() {
       const relativeTime = dayjs(this.articleInfo.pubdate).fromNow()
-      return `${this.articleInfo.aut_name}  ${this.articleInfo.title} ${relativeTime}`
+      return `${this.articleInfo.aut_name}  评论${this.articleInfo.comm_count} ${relativeTime}`
     }
   },
   watch: {}

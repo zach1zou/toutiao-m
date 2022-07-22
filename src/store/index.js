@@ -8,7 +8,8 @@ export default new Vuex.Store({
   state: {
     // user: JSON.parse(localStorage.getItem('TouTiao-Token')) || {}
     // user: storage.get('TouTiao-Token')
-    user: getToken() || {}
+    user: getToken() || {},
+    history: JSON.parse(localStorage.getItem('TouTiao-history')) || []
   },
   getters: {},
   mutations: {
@@ -17,6 +18,14 @@ export default new Vuex.Store({
       // localStorage.setItem('TouTiao-Token', JSON.stringify(payload))
       // storage.set('TouTiao-Token', payload)
       setToken(payload)
+    },
+    setHistory(state, payload) {
+      state.history = payload
+      localStorage.setItem('TouTiao-history', JSON.stringify(payload))
+    },
+    RemoveHistory(state, payload) {
+      state.history = payload
+      localStorage.removeItem('TouTiao-history')
     }
   },
   actions: {},

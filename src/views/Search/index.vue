@@ -12,28 +12,50 @@
         class="search"
       />
     </form>
-    <component :is="componentName" :keyword="keywords"> </component>
+    <component
+      :is="componentName"
+      :keyword="keywords"
+      :searchHistoryList="keywordArr"
+      :result="results"
+    ></component>
   </div>
 </template>
 <script>
+import { getResultListApi } from '@/api/search'
 import SearchHistory from './components/SearchHistory.vue'
 import SearchResult from './components/SearchResult.vue'
 import SearchSuggest from './components/SearchSuggest.vue'
 export default {
-  components: { SearchHistory, SearchResult, SearchSuggest },
+  components: {
+    SearchHistory,
+    SearchResult,
+    SearchSuggest
+  },
   data() {
     return {
       keywords: '',
-      isShowSearchResults: false
+      isShowSearchResults: false,
+      keywordArr: [],
+      results: []
     }
   },
   methods: {
-    onSearch() {
+    async onSearch() {
+      // 搜索建议
+      this.keywordArr.push(this.keywords)
+      this.$store.commit('setHistory', this.keywordArr)
+      // 搜索结果
       this.isShowSearchResults = true
+      const { data } = await getResultListApi(1, 10, this.keywords)
+
+      this.results = data.data.results
     },
     visibleSearchSuggestions() {
       this.isShowSearchResults = false
     }
+    // gotoResults(keywords) {
+    //  keywords = keywords
+    // }
   },
   mounted() {},
   updated() {},
@@ -45,7 +67,7 @@ export default {
         return 'SearchHistory'
       }
       if (this.isShowSearchResults) {
-        return 'SearchResults'
+        return 'SearchResult'
       }
       return 'SearchSuggest'
     }
