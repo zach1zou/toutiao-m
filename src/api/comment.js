@@ -12,12 +12,25 @@ export const getCommentListApi = (type, source, offset, limit) => {
     }
   })
 }
+// 对文章或者评论进行评论
+export const PostCommentListApi = (target, content, artId) => {
+  return request({
+    method: 'POST',
+    url: '/v1_0/comments',
+    data: {
+      target,
+      content,
+      art_id: artId
+    }
+  })
+}
+
 // 对评论或评论回复点赞
 export const getCommentlikingsApi = (target) => {
   return request({
     method: 'post',
     url: '/v1_0/comment/likings',
-    params: {
+    data: {
       target
     }
   })

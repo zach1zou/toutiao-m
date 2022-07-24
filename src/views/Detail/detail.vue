@@ -8,7 +8,12 @@
       </div>
       <van-cell :label="DetailInfo.pubdate" :title="DetailInfo.aut_name">
         <template #default>
-          <button>+关注</button>
+          <button
+            @click="isfollow(DetailInfo.is_followed)"
+            :class="{ follow: DetailInfo.is_followed }"
+          >
+            {{ DetailInfo.is_followed ? '取消关注' : '+关注' }}
+          </button>
         </template>
       </van-cell>
     </div>
@@ -19,7 +24,11 @@
     <van-divider>正文结束</van-divider>
     <!-- 评论 -->
 
-    <div class="CommentAuthor" v-for="item in commentInfo" :key="item.aut_id">
+    <div
+      class="CommentAuthor"
+      v-for="(item, index) in commentInfo"
+      :key="index"
+    >
       <div class="CommentAuthorIcon">
         <img :src="item.aut_photo" alt="" />
       </div>
@@ -29,14 +38,21 @@
         </template>
         <template #label>
           <div class="pubdata">
-            <div>{{ item.pubdate }}</div>
-            <button>回复{{ item.reply_count }}</button>
+            <div>{{ item.content }}</div>
+            <div>
+              <div>{{ item.pubdate }}</div>
+              <button>回复{{ item.reply_count }}</button>
+            </div>
           </div>
         </template>
 
         <template #default>
-          <button @click="replyFollowed(item.com_id)">
-            <i><van-icon name="good-job-o" /> </i> 赞
+          <button
+            @click="replyFollowed(item.com_id, index)"
+            :class="{ liking: item.is_liking }"
+          >
+            <i class="good-icon"><van-icon name="good-job-o" /> </i>
+            {{ item.is_liking ? '取消' : '赞' }}
           </button>
         </template>
       </van-cell>
@@ -48,21 +64,36 @@
     <!-- 底部 -->
     <div class="bottomContainer">
       <button @click="show = true">写评论</button>
-      <div><van-icon name="comment-o" badge="9" /></div>
+      <div><van-icon name="comment-o" :badge="commentInfo.length" /></div>
       <div><van-icon name="star-o" /></div>
       <div><van-icon name="good-job-o" /></div>
       <div><van-icon name="share-o" /></div>
     </div>
     <!-- 弹出 -->
-    <van-action-sheet v-model="show" title="标题">
-      <div class="content">内容</div>
-    </van-action-sheet>
+    <van-popup v-model="show" position="bottom" style="height: 120px">
+      <div class="PopContainer">
+        <van-field
+          v-model="message"
+          rows="2"
+          autosize
+          type="textarea"
+          maxlength="50"
+          placeholder="请输入留言"
+          show-word-limit
+        />
+        <button @click="comment">发布</button>
+      </div>
+    </van-popup>
   </div>
 </template>
 <script>
 import { getArticleDetailApi } from '@/api/news'
-import { getCommentListApi } from '@/api/comment'
-
+import {
+  getCommentListApi,
+  PostCommentListApi,
+  getCommentlikingsApi
+} from '@/api/comment'
+import { followingsApi, NotfollowingsApi } from '@/api/user'
 export default {
   props: {
     arr: {
@@ -79,7 +110,11 @@ export default {
     return {
       DetailInfo: {},
       commentInfo: [],
-      show: false
+      show: false,
+      message: '',
+      commentId: '',
+      ChangeColor: 'black',
+      aut_id: ''
     }
   },
   methods: {
@@ -90,11 +125,13 @@ export default {
       const { data } = await getArticleDetailApi(artId)
 
       this.DetailInfo = data.data
+      this.aut_id = data.data.aut_id
+      console.log(this.DetailInfo, '文章细节')
     },
     // 获取评论信息
     async getCommentList() {
       const artId = this.$router.history.current.params.articleId
-      console.log(artId)
+      console.log(artId, '获取评论ID')
       const { data } = await getCommentListApi('a', artId)
 
       this.commentInfo = data.data.results
@@ -102,15 +139,59 @@ export default {
     },
     onClickLeft() {
       this.$router.back()
-    }
-    // 写评论
+    },
+    // 对文章或者评论进行评论
+    async comment() {
+      const artId = this.$router.history.current.params.articleId
+      console.log(artId)
+      const { data } = await PostCommentListApi(artId, this.message)
+      console.log(data, '文章评论进行评论数据')
 
-    // 对文章评论或点赞
-    // async replyFollowed(id) {
-    //   console.log(id)
-    //   const res = await getCommentlikingsApi(id)
-    //   console.log(res)
-    // }
+      console.log(data.data.new_obj)
+      this.show = false
+      this.commentInfo.unshift(data.data.new_obj)
+    },
+    // 对评论或评论回复点赞
+    async replyFollowed(id, index) {
+      console.log(id, '评论id')
+      try {
+        const res = await getCommentlikingsApi(id)
+        console.log(res, '点赞')
+        if (res.status === 201) {
+          this.$toast.success('点赞成功')
+          // console.log(this.$refs.goodIcon, '点赞图标')
+
+          // this.$refs.goodIcon[index].style.color =
+          //   this.commentInfo[index].is_liking === true ? 'red' : 'black'
+        }
+      } catch (error) {
+        this.$toast.fail('点赞失败')
+      } finally {
+        this.commentInfo[index].is_liking = !this.commentInfo[index].is_liking
+      }
+    },
+    // 关注和取消关注
+    async isfollow(follow) {
+      try {
+        console.log(this.DetailInfo.aut_id, 'follow')
+
+        if (follow) {
+          await NotfollowingsApi(this.DetailInfo.aut_id)
+          this.$toast.success('取消关注')
+          this.DetailInfo.is_followed = false
+        } else {
+          // console.log(this.DetailInfo.is_followed, 'follow')
+
+          await followingsApi(this.DetailInfo.aut_id)
+          this.$toast.success('关注成功')
+          this.DetailInfo.is_followed = true
+        }
+      } catch (error) {
+      } finally {
+        // this.DetailInfo.is_followed = !this.DetailInfo.is_followed
+        // this.follow = !this.follow
+      }
+    }
   },
   mounted() {
     this.getArticleDetailInfo()
@@ -158,13 +239,18 @@ export default {
   }
   .van-cell {
     button {
-      color: white;
-      background: rgb(50, 150, 250);
-      border-color: rgb(50, 150, 250);
+      color: white !important;
+      background: rgb(50, 150, 250) !important;
+      border-color: rgb(50, 150, 250) !important;
       border-radius: 30px;
       width: 160px;
       height: 60px;
       border: none;
+      &.follow {
+        background: white !important;
+        border: #3a3a3a 1px solid !important;
+        color: black !important;
+      }
     }
   }
 }
@@ -244,8 +330,12 @@ export default {
     }
     .pubdata {
       display: flex;
-      button {
-        border: 1px solid #eee;
+      flex-direction: column;
+      div {
+        display: flex;
+        button {
+          border: 1px solid #eee;
+        }
       }
     }
   }
@@ -276,5 +366,24 @@ export default {
   div {
     flex: 1;
   }
+}
+// 弹出
+.PopContainer {
+  display: flex;
+  padding: 0.42667rem 0 0.42667rem 0.42667rem;
+  .van-field {
+    flex: 29;
+    background-color: #f5f7f9;
+  }
+  button {
+    color: #6ba3d8;
+    font-size: 0.37333rem;
+    background-color: white;
+    border: none;
+    flex: 6;
+  }
+}
+/deep/.liking {
+  color: red !important;
 }
 </style>

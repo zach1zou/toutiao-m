@@ -18,7 +18,11 @@
           </van-col>
           <van-col span="11">
             <van-row class="code-row" type="flex" align="center" justify="end">
-              <van-button class="code-btn" size="mini" round
+              <van-button
+                class="code-btn"
+                size="mini"
+                round
+                @click="$router.push('/user')"
                 >编辑资料</van-button
               >
             </van-row>
@@ -78,6 +82,7 @@
 </template>
 <script>
 import { getUserInfo } from '@/api/user'
+
 export default {
   props: {
     arr: {
@@ -143,6 +148,9 @@ export default {
   flex-direction: column;
   > .van-row {
     flex: 1;
+    .moblie {
+      color: white;
+    }
   }
   .code-btn {
     width: 1.53333rem;
