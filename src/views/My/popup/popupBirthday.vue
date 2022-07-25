@@ -24,8 +24,8 @@ export default {
   data() {
     return {
       isshow: false,
-      minDate: new Date(2020, 0, 1),
-      maxDate: new Date(2025, 10, 1),
+      minDate: new Date(1996, 0, 1),
+      maxDate: new Date(2022, 10, 1),
       currentDate: new Date()
     }
   },

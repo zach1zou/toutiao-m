@@ -49,7 +49,7 @@ export default {
         this.Info.intro
       )
 
-      this.$parent.userInfo.name = this.uname
+      this.$parent.info.name = this.uname
       this.isshow = false
     }
   },

@@ -41,7 +41,9 @@
             <div>{{ item.content }}</div>
             <div>
               <div>{{ item.pubdate }}</div>
-              <button>回复{{ item.reply_count }}</button>
+              <button @click="ReplyshowFn(item)">
+                回复{{ item.reply_count }}
+              </button>
             </div>
           </div>
         </template>
@@ -105,6 +107,15 @@
       position="bottom"
       :style="{ height: '30%' }"
     />
+    <!-- 弹出回复的回复层 -->
+    <van-popup
+      v-model="Replyshow"
+      closeable
+      position="bottom"
+      :style="{ height: '100%' }"
+    >
+      <Reply :item="item"></Reply>
+    </van-popup>
   </div>
 </template>
 <script>
@@ -121,6 +132,7 @@ import {
   getCommentlikingsApi
 } from '@/api/comment'
 import { followingsApi, NotfollowingsApi } from '@/api/user'
+import Reply from './replay/reply.vue'
 export default {
   props: {
     arr: {
@@ -132,7 +144,7 @@ export default {
       default: () => {}
     }
   },
-  components: {},
+  components: { Reply },
   data() {
     return {
       DetailInfo: {},
@@ -142,7 +154,9 @@ export default {
       commentId: '',
       ChangeColor: 'black',
       aut_id: '',
-      showTranslaction: false
+      showTranslaction: false,
+      Replyshow: false,
+      item: {}
     }
   },
   methods: {
@@ -254,6 +268,10 @@ export default {
           this.$toast.success('点赞成功')
         }
       } catch (error) {}
+    },
+    ReplyshowFn(item) {
+      this.Replyshow = true
+      this.item = item
     }
   },
   mounted() {
