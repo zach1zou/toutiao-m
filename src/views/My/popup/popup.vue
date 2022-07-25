@@ -25,17 +25,13 @@ import { ChangeUserInfoApi } from '@/api/user'
 
 export default {
   props: {
-    username: {
-      type: String,
-      default: () => ''
-    },
     Info: { type: Object, default: () => {} }
   },
   components: {},
   data() {
     return {
       isshow: false,
-      uname: this.username
+      uname: ''
     }
   },
   methods: {

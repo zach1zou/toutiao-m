@@ -7,13 +7,13 @@
       <van-cell title="头像" is-link @click="$refs.file.click()">
         <template #default>
           <div class="DivIcon">
-            <img :src="userInfo.photo" alt="" class="imgIcon" />
+            <img :src="info.photo" alt="" class="imgIcon" />
           </div>
         </template>
       </van-cell>
       <van-cell title="昵称" is-link @click="onShowName">
         <template #default>
-          <div>{{ userInfo.name }}</div>
+          <div>{{ info.name }}</div>
         </template>
       </van-cell>
 
@@ -41,20 +41,12 @@
       ></CropperImage>
     </van-popup>
     <!-- 姓名弹出层 -->
-    <Popup ref="popupInfo" :username="userInfo.name" :Info="info"></Popup>
+    <Popup ref="popupInfo" :Info="info"></Popup>
     <!-- 性别弹出层 -->
-    <PopupSex
-      ref="popupSexInfo"
-      :username="userInfo.name"
-      :Info="info"
-    ></PopupSex>
+    <PopupSex ref="popupSexInfo" :Info="info"></PopupSex>
 
     <!-- 生日弹出层 -->
-    <popupBirthdayVue
-      ref="popupBirthdayInfo"
-      :username="userInfo.name"
-      :Info="info"
-    ></popupBirthdayVue>
+    <popupBirthdayVue ref="popupBirthdayInfo" :Info="info"></popupBirthdayVue>
   </div>
 </template>
 <script>

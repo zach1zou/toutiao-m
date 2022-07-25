@@ -17,10 +17,6 @@ import { ChangeUserInfoApi } from '@/api/user'
 
 export default {
   props: {
-    username: {
-      type: String,
-      default: () => ''
-    },
     Info: { type: Object, default: () => {} }
   },
   components: {},
@@ -47,7 +43,7 @@ export default {
       const ymd = `${y}-${m}-${d}`
 
       await ChangeUserInfoApi(
-        this.uname,
+        this.Info.name,
         this.Info.gender,
         ymd,
         this.Info.realName,
