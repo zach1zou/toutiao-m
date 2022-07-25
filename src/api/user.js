@@ -51,7 +51,7 @@ export const ChangeUserInfoApi = (name, gender, birthday, realName, intro) => {
 export const ChangeUserPhotoApi = (photo) => {
   return request({
     method: 'PATCH',
-    url: '/v1_0/user/profile',
+    url: '/v1_0/user/photo',
     data: photo
   })
 }

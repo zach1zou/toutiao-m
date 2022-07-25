@@ -65,9 +65,23 @@
     <div class="bottomContainer">
       <button @click="show = true">写评论</button>
       <div><van-icon name="comment-o" :badge="commentInfo.length" /></div>
-      <div><van-icon name="star-o" /></div>
-      <div><van-icon name="good-job-o" /></div>
-      <div><van-icon name="share-o" /></div>
+      <div>
+        <van-icon
+          name="star"
+          @click="collections"
+          :class="{ collect: DetailInfo.is_collected }"
+        />
+      </div>
+      <div>
+        <van-icon
+          name="good-job"
+          @click="Likings"
+          :class="{
+            likings: DetailInfo.like_count === 0 ? false : true
+          }"
+        />
+      </div>
+      <div><van-icon name="share-o" @click="showTranslaction = true" /></div>
     </div>
     <!-- 弹出 -->
     <van-popup v-model="show" position="bottom" style="height: 120px">
@@ -84,10 +98,23 @@
         <button @click="comment">发布</button>
       </div>
     </van-popup>
+    <!-- 转发 -->
+    <van-popup
+      v-model="showTranslaction"
+      closeable
+      position="bottom"
+      :style="{ height: '30%' }"
+    />
   </div>
 </template>
 <script>
-import { getArticleDetailApi } from '@/api/news'
+import {
+  getArticleDetailApi,
+  getArticlecollectionsApi,
+  NotgetArticlecollectionsApi,
+  getArticleLikingApi,
+  NotgetArticleLikingApi
+} from '@/api/news'
 import {
   getCommentListApi,
   PostCommentListApi,
@@ -114,7 +141,8 @@ export default {
       message: '',
       commentId: '',
       ChangeColor: 'black',
-      aut_id: ''
+      aut_id: '',
+      showTranslaction: false
     }
   },
   methods: {
@@ -191,6 +219,41 @@ export default {
         // this.DetailInfo.is_followed = !this.DetailInfo.is_followed
         // this.follow = !this.follow
       }
+    },
+    // 收藏和取消收藏
+    async collections() {
+      const artId = this.$router.history.current.params.articleId
+      // console.log(this.DetailInfo.is_collected)
+      try {
+        if (this.DetailInfo.is_collected) {
+          await NotgetArticlecollectionsApi(artId)
+          this.DetailInfo.is_collected = false
+          this.$toast.success('取消收藏')
+        } else {
+          const res = await getArticlecollectionsApi(artId)
+          if (res.data.message === 'OK') {
+            this.$toast.success('收藏成功')
+            this.DetailInfo.is_collected = true
+          }
+        }
+      } catch (error) {}
+    },
+    // 点赞文章和取消点赞文章
+    async Likings() {
+      const artId = this.$router.history.current.params.articleId
+      console.log(this.DetailInfo.like_count)
+      try {
+        if (this.DetailInfo.like_count === !0) {
+          await NotgetArticleLikingApi(artId)
+
+          this.$toast.success('取消点赞')
+          this.DetailInfo.like_count--
+        } else {
+          await getArticleLikingApi(artId)
+          this.DetailInfo.like_count++
+          this.$toast.success('点赞成功')
+        }
+      } catch (error) {}
     }
   },
   mounted() {
@@ -385,5 +448,11 @@ export default {
 }
 /deep/.liking {
   color: red !important;
+}
+/deep/.collect {
+  color: #6ba3d8 !important;
+}
+/deep/.likings {
+  color: #6ba3d8 !important;
 }
 </style>

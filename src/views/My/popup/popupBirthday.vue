@@ -8,6 +8,7 @@
         :min-date="minDate"
         :max-date="maxDate"
         @confirm="onConfirm"
+        @cancel="onCancel"
       />
     </van-popup>
   </div>

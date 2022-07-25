@@ -1,6 +1,6 @@
 <template>
   <div>
-    <img :src="sureSava" ref="img" width="100%" />
+    <img :src="photo" ref="img" width="100%" />
     <van-button type="info" @click="confirm">完成</van-button>
   </div>
 </template>
@@ -10,30 +10,31 @@ import 'cropperjs/dist/cropper.css'
 import { ChangeUserPhotoApi } from '@/api/user'
 
 export default {
-  props: ['sureSava', 'showimg'],
+  props: ['photo'],
   components: {},
   data() {
-    return {}
+    return {
+      imgSrc: ''
+    }
   },
   methods: {
-    async confirm() {
+    confirm() {
       const fm = new FormData()
-      this.myCropper.getCroppedCanvas().toBlob(function(blob) {
-        fm.append('sureSava', blob)
+      this.myCropper.getCroppedCanvas().toBlob(async function(blob) {
+        fm.append('photo', blob)
+        await ChangeUserPhotoApi(fm)
       })
-      console.log(this.myCropper, 'myCropper')
 
-      const res = await ChangeUserPhotoApi(this.myCropper.url)
-      console.log(res.config.data, 'res')
-
-      this.$emit('showimg', this.showimg)
+      this.$parent.$parent.showImg = false
+      this.$parent.$parent.info.photo = this.imgSrc
     }
   },
   mounted() {
     const img = this.$refs.img
-    // console.log(img.src, 'refimg')
+    console.log(img.src, 'refimgsrc')
     this.myCropper = new Cropper(img, {})
     // console.log(this.myCropper, 'myCropper')
+    this.imgSrc = img.src
   },
   updated() {},
   beforeDestroy() {},

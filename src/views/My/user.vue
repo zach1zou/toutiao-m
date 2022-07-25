@@ -31,12 +31,10 @@
       position="bottom"
       :style="{ height: '100%' }"
       :lazy-render="false"
-      :showimg="showImg"
-      @showimg="showImgFn"
     >
       <CropperImage
         v-if="showImg"
-        :sureSava="photo"
+        :photo="photo"
         ref="CropperImage"
       ></CropperImage>
     </van-popup>
@@ -87,6 +85,7 @@ export default {
     onClickLeft() {
       this.$router.back()
     },
+
     // 修改姓名
     onShowName() {
       this.$refs.popupInfo.isshow = true
@@ -98,11 +97,6 @@ export default {
     // 修改生日
     onShowBirthday() {
       this.$refs.popupBirthdayInfo.isshow = true
-    },
-
-    showImgFn() {
-      console.log('showImgFn')
-      this.showImg = false
     }
   },
   mounted() {
@@ -114,6 +108,7 @@ export default {
       file = URL.createObjectURL(file)
       this.photo = file
       this.showImg = true
+      this.$refs.file.value = ''
     })
   },
   updated() {},
